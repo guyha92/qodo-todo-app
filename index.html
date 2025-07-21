@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React To-Do List App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      margin-top: 40px;
+      padding: 32px 24px 24px 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
+    form {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      border-radius: 0 4px 4px 0;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .delete-btn {
+      background: #dc3545;
+      border: none;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .delete-btn:hover {
+      background: #b52a37;
+    }
+    .task-completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+    .task-content {
+      flex: 1;
+      margin-left: 8px;
+    }
+    .task-checkbox {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+    <div id="root"></div>
+  </div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script>
+    const { useState } = React;
+
+    function TodoApp() {
+      const [tasks, setTasks] = useState([]);
+      const [input, setInput] = useState("");
+
+      function handleAddTask(e) {
+        e.preventDefault();
+        const trimmed = input.trim();
+        if (!trimmed) return;
+        setTasks([...tasks, { text: trimmed, completed: false }]);
+        setInput("");
+      }
+
+      function handleDeleteTask(idx) {
+        if (window.confirm('Are you sure?')) {
+          setTasks(tasks.filter((_, i) => i !== idx));
+        }
+      }
+
+      function handleToggleCompleted(idx) {
+        setTasks(tasks.map((task, i) =>
+          i === idx ? { ...task, completed: !task.completed } : task
+        ));
+      }
+
+      return (
+        React.createElement(React.Fragment, null,
+          React.createElement('form', { onSubmit: handleAddTask },
+            React.createElement('input', {
+              type: 'text',
+              value: input,
+              onChange: e => setInput(e.target.value),
+              placeholder: 'Add a new task...'
+            }),
+            React.createElement('button', { type: 'submit' }, 'Add')
+          ),
+          React.createElement('ul', null,
+            tasks.map((task, idx) =>
+              React.createElement('li', { key: idx },
+                React.createElement('input', {
+                  type: 'checkbox',
+                  className: 'task-checkbox',
+                  checked: task.completed,
+                  onChange: () => handleToggleCompleted(idx)
+                }),
+                React.createElement('span', {
+                  className: 'task-content' + (task.completed ? ' task-completed' : '')
+                }, task.text),
+                React.createElement('button', {
+                  className: 'delete-btn',
+                  onClick: () => handleDeleteTask(idx)
+                }, 'Delete')
+              )
+            )
+          )
+        )
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(TodoApp));
+  </script>
+</body>
+</html>
